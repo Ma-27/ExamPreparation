@@ -1,0 +1,4 @@
+include ':testmodule1'
+include ':exampreparation'
+include ':app'
+rootProject.name = "ExamPreparation"
