@@ -9,6 +9,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.mamh.R
+import com.mamh.database.local.AccountDatabase
 import com.mamh.databinding.FragmentHomeBinding
 
 class HomeFragment : Fragment() {
@@ -20,15 +21,19 @@ class HomeFragment : Fragment() {
             container: ViewGroup?,
             savedInstanceState: Bundle?
     ): View? {
-        homeViewModel =
-            ViewModelProvider(this).get(HomeViewModel::class.java)
-
         val binding: FragmentHomeBinding = DataBindingUtil.inflate(
-            inflater,
-            R.layout.fragment_home,
-            container,
-            false
+                inflater,
+                R.layout.fragment_home,
+                container,
+                false
         )
+
+        val application = requireNotNull(this.activity).application
+        val accountDao = AccountDatabase.getInstance(application).accountDatabaseDao
+
+        homeViewModel =
+                ViewModelProvider(this, HomeViewModelFactory(application, accountDao)).get(HomeViewModel::class.java)
+
 
         binding.lifecycleOwner = this
         binding.homeFragmentViewModel = homeViewModel
@@ -36,6 +41,8 @@ class HomeFragment : Fragment() {
         homeViewModel.text.observe(viewLifecycleOwner, Observer {
             binding.textHome.text = it
         })
+
+
         return binding.root
     }
 }

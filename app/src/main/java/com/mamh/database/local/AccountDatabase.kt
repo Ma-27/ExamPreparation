@@ -5,7 +5,7 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 
-@Database(entities = [AccountInfo::class], version = 1, exportSchema = false)
+@Database(entities = [AccountInfo::class], version = 2, exportSchema = false)
 abstract class AccountDatabase : RoomDatabase() {
     abstract val accountDatabaseDao: AccountDatabaseDao
 
@@ -15,19 +15,18 @@ abstract class AccountDatabase : RoomDatabase() {
         @Volatile
         private var INSTANCE: AccountDatabase? = null
 
-        //获取database单例，单例模式
-        fun getInstance(context: Context): AccountDatabase? {
-            var instance = INSTANCE
-
+        //获取database单例，单例模式；直接进入synchronized，确保线程安全
+        fun getInstance(context: Context): AccountDatabase {
             synchronized(this) {
+                var instance = INSTANCE
                 if (instance == null) {
                     instance = Room.databaseBuilder(
-                        context.applicationContext,
-                        AccountDatabase::class.java,
-                        "account_database"
+                            context.applicationContext,
+                            AccountDatabase::class.java,
+                            "account_database"
                     )
-                        .fallbackToDestructiveMigration()
-                        .build()
+                            .fallbackToDestructiveMigration()
+                            .build()
                     INSTANCE = instance
                 }
                 //结束函数，防止其他线程直接返回对象
